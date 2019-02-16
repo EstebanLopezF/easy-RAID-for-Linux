@@ -1,32 +1,20 @@
 #!/bin/bash
 
 numberOfDisks=5
-sizeOfDisksGB=7
+sizeOfDisksGB=7GB
 raidLevel=0
 deviceName=md127
 mountPoint=/data
+part=(b c d e f g h i j k l m n o p q r s t u v w x y z);
 
-for i in $numberOfDisks; do
-	parted --script /dev/sdc 'mklabel gpt mkpart primary 1MiB 4000GiB'
+for (( COUNT=1 ; COUNT <= $numberOfDisks ; COUNT++ )) ; do
+	echo parted --script /dev/sd${part[$COUNT]} "mklabel gpt mkpart primary 1MiB $sizeOfDisksGB"
+	#echo ${part[$COUNT]}
 done;
 
-#parted --script /dev/sdc 'mklabel gpt mkpart primary 1MiB 4000GiB'
-#parted --script /dev/sdd 'mklabel gpt mkpart primary 1MiB 4000GiB'
-#parted --script /dev/sde 'mklabel gpt mkpart primary 1MiB 4000GiB'
-#parted --script /dev/sdf 'mklabel gpt mkpart primary 1MiB 4000GiB'
-#parted --script /dev/sdg 'mklabel gpt mkpart primary 1MiB 4000GiB'
-#parted --script /dev/sdh 'mklabel gpt mkpart primary 1MiB 4000GiB'
-#parted --script /dev/sdi 'mklabel gpt mkpart primary 1MiB 4000GiB'
-#parted --script /dev/sdj 'mklabel gpt mkpart primary 1MiB 4000GiB'
-
-while [ ! -e "/dev/sdc1" ]; do sleep 1; done
-while [ ! -e "/dev/sdd1" ]; do sleep 1; done
-while [ ! -e "/dev/sde1" ]; do sleep 1; done
-while [ ! -e "/dev/sdf1" ]; do sleep 1; done
-while [ ! -e "/dev/sdg1" ]; do sleep 1; done
-while [ ! -e "/dev/sdh1" ]; do sleep 1; done
-while [ ! -e "/dev/sdi1" ]; do sleep 1; done
-while [ ! -e "/dev/sdj1" ]; do sleep 1; done
+for (( COUNT2=1 ; COUNT2 <= $numberOfDisks ; COUNT2++ )) ; do
+	while [ ! -e "/dev/sd${part[$COUNT2]}" ]; do sleep 1; done
+done;
 
 mdadm --create $deviceName --level $raidLevel --raid-devices $numberOfDisks /dev/sd{c,d,e,f,g,h,i,j}
 
