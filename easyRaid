@@ -1,0 +1,42 @@
+#!/bin/bash
+
+numberOfDisks=5
+sizeOfDisksGB=7
+raidLevel=0
+deviceName=md127
+mountPoint=/data
+
+for i in $numberOfDisks; do
+	parted --script /dev/sdc 'mklabel gpt mkpart primary 1MiB 4000GiB'
+done;
+
+#parted --script /dev/sdc 'mklabel gpt mkpart primary 1MiB 4000GiB'
+#parted --script /dev/sdd 'mklabel gpt mkpart primary 1MiB 4000GiB'
+#parted --script /dev/sde 'mklabel gpt mkpart primary 1MiB 4000GiB'
+#parted --script /dev/sdf 'mklabel gpt mkpart primary 1MiB 4000GiB'
+#parted --script /dev/sdg 'mklabel gpt mkpart primary 1MiB 4000GiB'
+#parted --script /dev/sdh 'mklabel gpt mkpart primary 1MiB 4000GiB'
+#parted --script /dev/sdi 'mklabel gpt mkpart primary 1MiB 4000GiB'
+#parted --script /dev/sdj 'mklabel gpt mkpart primary 1MiB 4000GiB'
+
+while [ ! -e "/dev/sdc1" ]; do sleep 1; done
+while [ ! -e "/dev/sdd1" ]; do sleep 1; done
+while [ ! -e "/dev/sde1" ]; do sleep 1; done
+while [ ! -e "/dev/sdf1" ]; do sleep 1; done
+while [ ! -e "/dev/sdg1" ]; do sleep 1; done
+while [ ! -e "/dev/sdh1" ]; do sleep 1; done
+while [ ! -e "/dev/sdi1" ]; do sleep 1; done
+while [ ! -e "/dev/sdj1" ]; do sleep 1; done
+
+mdadm --create $deviceName --level $raidLevel --raid-devices $numberOfDisks /dev/sd{c,d,e,f,g,h,i,j}
+
+mkfs -t ext4 $deviceName
+
+mkdir $mountPoint
+
+uuid=$(blkid -o value -s UUID $deviceName)
+echo "UUID=$uuid     $mountPoint   ext4    defaults,discard,nofail        0 2" >> /etc/fstab
+mount -a
+echo "bootdegraded=true" >> /etc/default/grub
+cp -a /boot/grub2/grub.cfg /boot/grub2/grub.cfg.bak
+grub2-mkconfig -o /boot/grub2/grub.cfg
