@@ -16,7 +16,7 @@ for (( COUNT2=1 ; COUNT2 <= $numberOfDisks ; COUNT2++ )) ; do
 	while [ ! -e "/dev/sd${part[$COUNT2]}" ]; do sleep 1; done
 done;
 
-mdadm --create $deviceName --level $raidLevel --raid-devices $numberOfDisks /dev/sdb1 /dev/sdc1
+mdadm --create $deviceName --level $raidLevel --raid-devices $numberOfDisks /dev/sdb1 /dev/sdc1 #need to add count
 mkfs -t $fileSystem /dev/$deviceName
 mkdir $mountPoint
 
