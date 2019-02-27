@@ -1,4 +1,5 @@
 #!/bin/bash
+#creates a RAID 0 using 8x4TB data disks and mount it in /data with fstab entry
 
 parted --script /dev/sdc 'mklabel gpt mkpart primary 1MiB 4000GiB'
 parted --script /dev/sdd 'mklabel gpt mkpart primary 1MiB 4000GiB'
@@ -8,10 +9,6 @@ parted --script /dev/sdg 'mklabel gpt mkpart primary 1MiB 4000GiB'
 parted --script /dev/sdh 'mklabel gpt mkpart primary 1MiB 4000GiB'
 parted --script /dev/sdi 'mklabel gpt mkpart primary 1MiB 4000GiB'
 parted --script /dev/sdj 'mklabel gpt mkpart primary 1MiB 4000GiB'
-
-# gotta wait to catch them all. parted used udev to fire asynchronously,
-# so if we just move to mdadm, it will fail and then everthing goes
-# .
 
 while [ ! -e "/dev/sdc1" ]; do sleep 1; done
 while [ ! -e "/dev/sdd1" ]; do sleep 1; done
@@ -32,3 +29,5 @@ uuid=$(blkid -o value -s UUID /dev/md127)
 echo "UUID=$uuid     /data   ext4    defaults,discard        0       2" >> /etc/fstab
 mount -a
 echo "bootdegraded=true" >> /etc/default/grub
+
+exit 0;
